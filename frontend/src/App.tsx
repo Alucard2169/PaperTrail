@@ -6,9 +6,14 @@ import { Label } from './components/ui/label'
 import pdfDoc from './assets/pdfDoc.svg'
 import { useState } from 'react'
 
+interface FileState {
+  status: "file" | "error";
+  message: string;
+}
+
 
 function App() {
-  const [fileState, setFileState] = useState<string | null>(null);
+  const [fileState, setFileState] = useState<FileState | null>(null);
 
   console.log(fileState);
 
@@ -26,16 +31,20 @@ function App() {
       <Label htmlFor="paperPDF" className='relative w-full bg-secondary hover:bg-background transition-all ease-in-out rounded-md h-20 flex justify-center'>
         <div className='absolute gap-4 flex items-center'>
           <img src={pdfDoc} alt="pdf icon" className="h-10 mx-auto pt-2" />
-          <p>{fileState ? fileState : "Upload PDF"}</p>
+          <p>{fileState ? fileState.message : "Upload PDF"}</p>
         </div>
         <Input id="paperPDF" onChange={(e)=>{
           const file = e.target.files?.[0];
-          if (file) {
-          setFileState(file.name);
+          console.log(file)
+          if (file && file.type === "application/pdf") {
+          setFileState({status: "file", message: file.name});
+          } 
+          else {
+            setFileState({status: "error", message: "Please upload a valid PDF file."});
           }
         }} type="file" className='opacity-0 h-20'/>
       </Label>
-      {fileState && <Button type="submit" variant="outline">Submit</Button>}
+      {fileState && fileState.status === "file" && <Button type="submit" variant="outline">Submit</Button>}
     </div>
       </section>
 
